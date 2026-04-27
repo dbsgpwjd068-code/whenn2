@@ -63,6 +63,7 @@
       border: 1px solid var(--border);
       border-radius: 16px;
       padding: 24px;
+      position: relative; /* 툴팁의 기준점이 됨 */
     }
     .card-title {
       font-family: 'Black Han Sans', sans-serif;
@@ -79,3 +80,495 @@
       border-radius: 10px;
       padding: 11px 16px;
       color: var(--text);
+      font-family: inherit;
+      font-size: .95rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .setup-row input:focus { border-color: var(--accent); }
+    .setup-row input::placeholder { color: var(--muted); }
+    button {
+      background: var(--accent);
+      color: #0d0d0f;
+      border: none;
+      border-radius: 10px;
+      padding: 11px 22px;
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: .95rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity .15s, transform .1s;
+    }
+    button:hover { opacity: .85; }
+    button:active { transform: scale(.97); }
+    button.secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .share-banner {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+    }
+    .share-banner.visible { display: flex; }
+    .share-url { flex: 1; font-size: .82rem; color: var(--accent2); word-break: break-all; }
+    .copy-btn {
+      background: var(--surface);
+      color: var(--accent2);
+      border: 1px solid var(--accent2);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: .82rem;
+      cursor: pointer;
+    }
+    .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .cal-month { font-family: 'Black Han Sans', sans-serif; font-size: 1.15rem; color: var(--text); }
+    .cal-nav button { background: var(--surface2); color: var(--text); border: 1px solid var(--border); padding: 7px 14px; border-radius: 8px; }
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+    .cal-dow { text-align: center; font-size: .72rem; color: var(--muted); padding: 4px 0 8px; letter-spacing: .5px; }
+    .cal-dow:first-child { color: #f08080; }
+    .cal-dow:last-child { color: #80a0f0; }
+    .day {
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      position: relative;
+      transition: background .15s, border-color .15s;
+      font-size: .85rem;
+      user-select: none;
+      gap: 2px;
+    }
+    .day:hover:not(.empty):not(.past) { border-color: var(--border); background: var(--surface2); }
+    .day.empty { cursor: default; }
+    .day.past { opacity: .3; cursor: not-allowed; }
+    .day.today .day-num { color: var(--accent); font-weight: bold; }
+    .day-num { line-height: 1; }
+    .day.heat-1 { background: rgba(200,240,96,.12); }
+    .day.heat-2 { background: rgba(200,240,96,.25); }
+    .day.heat-3 { background: rgba(200,240,96,.40); }
+    .day.heat-4 { background: rgba(200,240,96,.60); }
+    .day.heat-5 { background: rgba(200,240,96,.80); border-color: var(--accent); }
+    .day.mine { border-color: var(--accent) !important; }
+    .day-dots { display: flex; gap: 2px; flex-wrap: wrap; justify-content: center; max-width: 36px; }
+    .dot { width: 5px; height: 5px; border-radius: 50%; }
+
+    /* ── TOOLTIP (그리드 밖 절대 위치) ── */
+    .tooltip {
+      display: none;
+      position: absolute;
+      z-index: 999;
+      background: #1e1e26;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      width: 180px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.8);
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: auto;
+    }
+    .tooltip.visible { display: flex; }
+    .tooltip::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 8px solid #1e1e26;
+    }
+    .tooltip-date {
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: .9rem;
+      color: var(--accent);
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .tooltip-person {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: .82rem;
+    }
+    .tooltip-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .tooltip-empty { font-size: .8rem; color: var(--muted); text-align: center; padding: 2px 0; }
+    .tooltip-btns { display: flex; gap: 6px; margin-top: 2px; }
+    .tooltip-btns button { flex: 1; padding: 8px 4px; font-size: .78rem; border-radius: 8px; }
+
+    .members-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .member-chip {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: .85rem;
+    }
+    .member-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .member-me { border-color: var(--accent); color: var(--accent); }
+    .best-list { display: flex; flex-direction: column; gap: 8px; }
+    .best-item {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--surface2);
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: .9rem;
+    }
+    .best-item-left { display: flex; flex-direction: column; gap: 3px; }
+    .best-item-names { font-size: .75rem; color: var(--muted); }
+    .best-count { font-family: 'Black Han Sans', sans-serif; font-size: 1rem; color: var(--accent); }
+    #status { text-align: center; font-size: .82rem; color: var(--muted); min-height: 20px; padding: 10px; }
+    @media (max-width: 480px) {
+      .day { font-size: .72rem; border-radius: 7px; }
+      .cal-grid { gap: 3px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>언제만날까 🗓️</h1>
+  <p>친구들과 가능한 날짜를 공유하고 최적의 날을 찾아봐요</p>
+</header>
+
+<main>
+  <div class="card" id="setup-card">
+    <div class="card-title">👤 이름 입력 & 방 만들기</div>
+    <div class="setup-row">
+      <input id="name-input" type="text" placeholder="내 이름 (예: 김철수)" maxlength="12"/>
+      <input id="room-input" type="text" placeholder="방 이름 (새로 만들 때)" maxlength="20"/>
+      <button onclick="createRoom()">방 만들기</button>
+      <button class="secondary" onclick="joinRoom()">기존 방 참여</button>
+    </div>
+  </div>
+
+  <div class="share-banner" id="share-banner">
+    <span style="color:var(--muted);font-size:.82rem;white-space:nowrap">🔗 공유 링크</span>
+    <span class="share-url" id="share-url"></span>
+    <button class="copy-btn" onclick="copyLink()">복사</button>
+  </div>
+
+  <div class="card" id="cal-card" style="display:none">
+    <div class="cal-nav">
+      <button onclick="changeMonth(-1)">◀</button>
+      <span class="cal-month" id="cal-month-label"></span>
+      <button onclick="changeMonth(1)">▶</button>
+    </div>
+    
+    <div class="tooltip" id="tooltip">
+      <div class="tooltip-date" id="tooltip-date"></div>
+      <div id="tooltip-who"></div>
+      <div class="tooltip-btns">
+        <button class="secondary" onclick="closeTooltip()">닫기</button>
+        <button id="tooltip-toggle-btn" onclick="tooltipToggle()"></button>
+      </div>
+    </div>
+
+    <div class="cal-grid" id="cal-grid"></div>
+    <p style="margin-top:14px;font-size:.78rem;color:var(--muted)">날짜를 탭하면 누가 가능한지 볼 수 있어요.</p>
+  </div>
+
+  <div class="card" id="members-card" style="display:none">
+    <div class="card-title">👥 참여중인 친구들</div>
+    <div class="members-list" id="members-list"></div>
+  </div>
+
+  <div class="card" id="best-card" style="display:none">
+    <div class="card-title">🏆 모두가 가능한 날 TOP 5</div>
+    <div class="best-list" id="best-list"></div>
+  </div>
+
+  <div id="status"></div>
+</main>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, set, get, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDhQWCcC806Cs0SKfxD9Ip4KWimZ0qhCIM",
+  authDomain: "when-we-meet-efb40.firebaseapp.com",
+  databaseURL: "https://when-we-meet-efb40-default-rtdb.firebaseio.com",
+  projectId: "when-we-meet-efb40",
+  storageBucket: "when-we-meet-efb40.firebasestorage.app",
+  messagingSenderId: "863569184436",
+  appId: "1:863569184436:web:0ffb85e7cfab2fce0779e1"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let myName = '', roomId = '', myColor = '';
+let viewYear, viewMonth;
+let roomData = {};
+let tooltipDateStr = '';
+
+const COLORS = ['#c8f060','#60f0c8','#f0c860','#f060a8','#60a8f0','#a860f0','#f09060','#60f090'];
+
+function uid() { return Math.random().toString(36).slice(2,8).toUpperCase(); }
+function today() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function status(msg) { document.getElementById('status').textContent = msg; }
+
+window.createRoom = async function() {
+  try {
+    const name = document.getElementById('name-input').value.trim();
+    const rname = document.getElementById('room-input').value.trim() || '우리의 약속';
+    if (!name) { alert('이름을 입력해주세요!'); return; }
+    status('방 만드는 중...');
+    const nameKey = rname.replace(/[.#$[\]]/g, '_');
+    const nameIndexRef = ref(db, `roomNames/${nameKey}`);
+    const nameSnap = await get(nameIndexRef);
+    if (nameSnap.exists()) {
+      alert(`"${rname}" 방이 이미 존재해요!`);
+      status(''); return;
+    }
+    myName = name; roomId = uid(); myColor = COLORS[0];
+    await set(nameIndexRef, roomId);
+    await set(ref(db, `rooms/${roomId}`), {
+      name: rname, createdAt: Date.now(),
+      members: { [myName]: { color: myColor, dates: {} } }
+    });
+    initRoom();
+  } catch(e) { alert('오류 발생: ' + e.message); status(''); }
+};
+
+window.joinRoom = async function() {
+  const name = document.getElementById('name-input').value.trim();
+  const rname = document.getElementById('room-input').value.trim();
+  if (!name) { alert('이름을 입력해주세요!'); return; }
+  const urlRoom = new URLSearchParams(location.search).get('r');
+  
+  if (urlRoom) { roomId = urlRoom; } 
+  else if (rname) {
+    const nameKey = rname.replace(/[.#$[\]]/g, '_');
+    const nameSnap = await get(ref(db, `roomNames/${nameKey}`));
+    if (!nameSnap.exists()) { alert(`방을 찾을 수 없어요!`); return; }
+    roomId = nameSnap.val();
+  } else { alert('방 이름을 입력하거나 공유 링크로 접속해주세요!'); return; }
+  
+  myName = name;
+  const snap = await get(ref(db, `rooms/${roomId}`));
+  if (!snap.exists()) { alert('방을 찾을 수 없어요.'); return; }
+  
+  const members = snap.val().members || {};
+  if (members[myName]) {
+    myColor = members[myName].color;
+  } else {
+    const usedColors = Object.values(members).map(m => m.color);
+    myColor = COLORS.find(c => !usedColors.includes(c)) || COLORS[Object.keys(members).length % COLORS.length];
+    await update(ref(db, `rooms/${roomId}/members/${myName}`), { color: myColor, dates: {} });
+  }
+  initRoom();
+};
+
+function initRoom() {
+  const d = new Date();
+  viewYear = d.getFullYear(); viewMonth = d.getMonth();
+  document.getElementById('setup-card').style.display = 'none';
+  document.getElementById('cal-card').style.display = 'block';
+  document.getElementById('members-card').style.display = 'block';
+  document.getElementById('best-card').style.display = 'block';
+  document.getElementById('share-url').textContent = `${location.origin}${location.pathname}?r=${roomId}`;
+  document.getElementById('share-banner').classList.add('visible');
+  history.replaceState({}, '', `?r=${roomId}`);
+  
+  onValue(ref(db, `rooms/${roomId}`), snap => {
+    if (!snap.exists()) return;
+    roomData = snap.val();
+    renderCalendar();
+    renderMembers();
+    renderBest();
+  });
+  status('연결됨 ✅');
+}
+
+window.changeMonth = function(delta) {
+  viewMonth += delta;
+  if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+  if (viewMonth < 0)  { viewMonth = 11; viewYear--; }
+  closeTooltip();
+  renderCalendar();
+};
+
+function renderCalendar() {
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+
+  document.getElementById('cal-month-label').textContent = `${viewYear}년 ${viewMonth+1}월`;
+  ['일','월','화','수','목','금','토'].forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-dow'; el.textContent = d;
+    grid.appendChild(el);
+  });
+
+  const first = new Date(viewYear, viewMonth, 1).getDay();
+  const total = new Date(viewYear, viewMonth+1, 0).getDate();
+  const todayStr = today();
+  const members = roomData.members || {};
+  const myDates = (members[myName]?.dates) || {};
+  const countMap = {}, whoMap = {};
+  
+  Object.entries(members).forEach(([name, m]) => {
+    Object.keys(m.dates || {}).forEach(dk => {
+      if (m.dates[dk]) {
+        countMap[dk] = (countMap[dk] || 0) + 1;
+        if (!whoMap[dk]) whoMap[dk] = [];
+        whoMap[dk].push({ name, color: m.color });
+      }
+    });
+  });
+  
+  const maxCount = Math.max(1, ...Object.values(countMap));
+
+  for (let i = 0; i < first; i++) {
+    grid.appendChild(document.createElement('div')).className = 'day empty';
+  }
+  
+  for (let d = 1; d <= total; d++) {
+    const dateStr = `${viewYear}-${String(viewMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isPast = dateStr < todayStr;
+    const isMine = !!myDates[dateStr];
+    const count = countMap[dateStr] || 0;
+    const heatLevel = count === 0 ? 0 : Math.ceil((count / maxCount) * 5);
+    
+    const el = document.createElement('div');
+    el.className = 'day' + (isPast ? ' past' : '') + (dateStr === todayStr ? ' today' : '') +
+                   (isMine ? ' mine' : '') + (heatLevel ? ` heat-${heatLevel}` : '');
+    
+    const numEl = document.createElement('div');
+    numEl.className = 'day-num'; numEl.textContent = d;
+    el.appendChild(numEl);
+    
+    if (count > 0) {
+      const dots = document.createElement('div');
+      dots.className = 'day-dots';
+      (whoMap[dateStr] || []).forEach(w => {
+        const dot = document.createElement('div');
+        dot.className = 'dot'; dot.style.background = w.color;
+        dots.appendChild(dot);
+      });
+      el.appendChild(dots);
+    }
+    
+    if (!isPast) {
+      el.onclick = (e) => { 
+        e.stopPropagation(); 
+        openTooltip(dateStr, el); 
+      };
+    }
+    grid.appendChild(el);
+  }
+}
+
+window.openTooltip = function(dateStr, dayEl) {
+  const tooltip = document.getElementById('tooltip');
+  const members = roomData.members || {};
+  const myDates = (members[myName]?.dates) || {};
+  const isMine = !!myDates[dateStr];
+  const [, mo, d] = dateStr.split('-');
+  const dow = ['일','월','화','수','목','금','토'][new Date(dateStr).getDay()];
+
+  tooltipDateStr = dateStr;
+  document.getElementById('tooltip-date').textContent = `${+mo}월 ${+d}일 (${dow})`;
+
+  const whoEl = document.getElementById('tooltip-who');
+  whoEl.innerHTML = '';
+  const whoList = Object.entries(members).filter(([, m]) => m.dates?.[dateStr]);
+
+  if (whoList.length === 0) {
+    whoEl.innerHTML = '<div class="tooltip-empty">아직 아무도 없어요</div>';
+  } else {
+    whoList.forEach(([n, m]) => {
+      const row = document.createElement('div');
+      row.className = 'tooltip-person';
+      row.innerHTML = `<div class="tooltip-dot" style="background:${m.color}"></div><span>${n}${n === myName ? ' (나)' : ''}</span>`;
+      whoEl.appendChild(row);
+    });
+  }
+
+  const btn = document.getElementById('tooltip-toggle-btn');
+  btn.textContent = isMine ? '취소 ❌' : '가능! ✅';
+  btn.style.background = isMine ? 'var(--danger)' : 'var(--accent)';
+  btn.style.color = isMine ? '#fff' : '#0d0d0f';
+
+  // [핵심] 위치 계산 로직
+  tooltip.style.display = 'flex';
+  
+  // 부모 카드(.card) 기준 상대 좌표 계산
+  const card = dayEl.closest('.card');
+  const cardRect = card.getBoundingClientRect();
+  const dayRect = dayEl.getBoundingClientRect();
+  
+  const left = (dayRect.left - cardRect.left) + (dayRect.width / 2) - (tooltip.offsetWidth / 2);
+  const top = (dayRect.top - cardRect.top) - tooltip.offsetHeight - 10;
+  
+  tooltip.style.left = Math.max(10, Math.min(left, card.offsetWidth - tooltip.offsetWidth - 10)) + 'px';
+  tooltip.style.top = top + 'px';
+  tooltip.classList.add('visible');
+}
+
+window.closeTooltip = () => {
+  const t = document.getElementById('tooltip');
+  t.classList.remove('visible');
+  t.style.display = 'none';
+};
+
+window.tooltipToggle = async function() {
+  if (!tooltipDateStr) return;
+  const current = !!(roomData.members[myName]?.dates?.[tooltipDateStr]);
+  await update(ref(db, `rooms/${roomId}/members/${myName}/dates`), { [tooltipDateStr]: !current });
+  closeTooltip();
+};
+
+function renderMembers() {
+  const list = document.getElementById('members-list');
+  list.innerHTML = '';
+  Object.entries(roomData.members || {}).forEach(([name, m]) => {
+    const chip = document.createElement('div');
+    chip.className = 'member-chip' + (name === myName ? ' member-me' : '');
+    chip.innerHTML = `<div class="member-dot" style="background:${m.color}"></div><span>${name}${name === myName ? ' (나)' : ''}</span>`;
+    list.appendChild(chip);
+  });
+}
+
+function renderBest() {
+  const members = roomData.members || {};
+  const countMap = {};
+  Object.entries(members).forEach(([name, m]) => {
+    Object.keys(m.dates || {}).forEach(dk => { if (m.dates[dk]) countMap[dk] = (countMap[dk] || 0) + 1; });
+  });
+  const sorted = Object.entries(countMap).filter(([,c]) => c > 0).sort((a,b) => b[1]-a[1]).slice(0,5);
+  const list = document.getElementById('best-list');
+  list.innerHTML = sorted.length ? '' : '<p style="color:var(--muted);font-size:.85rem">아직 없어요</p>';
+  sorted.forEach(([date, count]) => {
+    const [,m,d] = date.split('-');
+    const dow = ['일','월','화','수','목','금','토'][new Date(date).getDay()];
+    const item = document.createElement('div');
+    item.className = 'best-item';
+    item.innerHTML = `<div class="best-item-left"><span>${+m}월 ${+d}일 (${dow})</span></div><span class="best-count">${count}명 가능</span>`;
+    list.appendChild(item);
+  });
+}
+
+window.copyLink = () => {
+  navigator.clipboard.writeText(document.getElementById('share-url').textContent).then(() => alert('복사되었습니다!'));
+};
+</script>
+
+</body>
+</html>
