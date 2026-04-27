@@ -7,102 +7,222 @@
   <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Black+Han+Sans&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --bg: #0d0d0f; --surface: #18181c; --surface2: #222228; --border: #2e2e38;
-      --accent: #c8f060; --accent2: #60f0c8; --text: #f0f0f0; --muted: #888; --danger: #f06060;
+      --bg: #0d0d0f;
+      --surface: #18181c;
+      --surface2: #222228;
+      --border: #2e2e38;
+      --accent: #c8f060;
+      --accent2: #60f0c8;
+      --text: #f0f0f0;
+      --muted: #888;
+      --danger: #f06060;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: 'Gowun Dodum', sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
-    header { width: 100%; padding: 40px 20px 28px; text-align: center; border-bottom: 1px solid var(--border); position: relative; }
-    header h1 { font-family: 'Black Han Sans', sans-serif; font-size: clamp(1.8rem, 5vw, 2.8rem); color: var(--accent); }
-    main { width: 100%; max-width: 600px; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
-    .card-title { font-family: 'Black Han Sans', sans-serif; color: var(--accent); margin-bottom: 15px; font-size: 1.1rem; }
-    .setup-row { display: flex; gap: 8px; flex-wrap: wrap; }
-    .setup-row input { flex: 1; min-width: 120px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: var(--text); outline: none; }
-    button { background: var(--accent); color: #000; border: none; border-radius: 10px; padding: 12px 18px; font-family: 'Black Han Sans', sans-serif; cursor: pointer; transition: 0.2s; }
-    button:active { transform: scale(0.95); opacity: 0.8; }
-    .secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-    .share-banner { display: none; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 12px; align-items: center; gap: 10px; margin-bottom: 10px; }
-    .share-banner.visible { display: flex; }
-    .share-url { flex: 1; font-size: 0.75rem; color: var(--accent2); word-break: break-all; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-    .cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-    .cal-month { font-family: 'Black Han Sans', sans-serif; font-size: 1.2rem; }
-    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-    .cal-dow { text-align: center; font-size: 0.7rem; color: var(--muted); padding: 5px 0; }
-    .day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; font-size: 0.8rem; border: 1.5px solid transparent; position: relative; }
-    .day.empty { cursor: default; }
-    .day.today { color: var(--accent); font-weight: bold; text-decoration: underline; }
-    .day.mine { border-color: var(--accent) !important; }
-    .day.heat-1 { background: rgba(200,240,96,0.15); }
-    .day.heat-2 { background: rgba(200,240,96,0.35); }
-    .day.heat-3 { background: rgba(200,240,96,0.55); }
-    .day.heat-4 { background: rgba(200,240,96,0.75); }
-    .day.heat-5 { background: rgba(200,240,96,0.95); color: #000; }
-    .day-dots { display: flex; gap: 2px; margin-top: 2px; height: 4px; justify-content: center; }
-    .dot { width: 4px; height: 4px; border-radius: 50%; }
-
-    /* ── 툴팁 (최상위 배치) ── */
-    #tooltip {
-      display: none; position: fixed; z-index: 10000;
-      background: #1e1e26; border: 1px solid var(--border); border-radius: 12px;
-      padding: 12px; width: 170px; box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-      flex-direction: column; gap: 8px; pointer-events: auto;
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Gowun Dodum', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    #tooltip::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid #1e1e26; }
-    .tooltip-date { font-family: 'Black Han Sans', sans-serif; font-size: 0.9rem; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 6px; }
-    .tooltip-who-list { max-height: 100px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
-    .tooltip-person { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; }
-    .tooltip-dot { width: 8px; height: 8px; border-radius: 50%; }
-    .tooltip-btns { display: flex; gap: 6px; margin-top: 4px; }
-    .tooltip-btns button { flex: 1; padding: 8px; font-size: 0.75rem; border-radius: 8px; }
+    header {
+      width: 100%;
+      padding: 40px 20px 28px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 120% at 50% -20%, rgba(200,240,96,.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    header h1 {
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      letter-spacing: -1px;
+      color: var(--accent);
+      position: relative;
+    }
+    header p { margin-top: 6px; color: var(--muted); font-size: .95rem; position: relative; }
+    main {
+      width: 100%;
+      max-width: 860px;
+      padding: 28px 20px 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    .card-title {
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: 1.05rem;
+      color: var(--accent);
+      margin-bottom: 16px;
+      letter-spacing: .5px;
+    }
+    .setup-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .setup-row input {
+      flex: 1; min-width: 160px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 16px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: .95rem;
+      outline: none;
+    }
+    button {
+      background: var(--accent);
+      color: #0d0d0f;
+      border: none;
+      border-radius: 10px;
+      padding: 11px 22px;
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: .95rem;
+      cursor: pointer;
+      transition: opacity .15s, transform .1s;
+    }
+    button.secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .share-banner {
+      display: none; align-items: center; gap: 10px; flex-wrap: wrap;
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px;
+    }
+    .share-banner.visible { display: flex; }
+    .share-url { flex: 1; font-size: .82rem; color: var(--accent2); word-break: break-all; }
+    .copy-btn {
+      background: var(--surface); color: var(--accent2); border: 1px solid var(--accent2);
+      border-radius: 8px; padding: 7px 14px; font-size: .82rem; cursor: pointer;
+    }
+    .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .cal-month { font-family: 'Black Han Sans', sans-serif; font-size: 1.15rem; color: var(--text); }
+    .cal-nav button { background: var(--surface2); color: var(--text); border: 1px solid var(--border); padding: 7px 14px; border-radius: 8px; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; position: relative; }
+    .cal-dow { text-align: center; font-size: .72rem; color: var(--muted); padding: 4px 0 8px; }
+    .cal-dow:first-child { color: #f08080; }
+    .cal-dow:last-child { color: #80a0f0; }
+    .day {
+      aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      border-radius: 10px; border: 1.5px solid transparent; cursor: pointer; position: relative;
+      transition: background .15s, border-color .15s; font-size: .85rem; user-select: none; gap: 2px;
+    }
+    .day.past { opacity: 0.3; cursor: not-allowed; }
+    .day.today .day-num { color: var(--accent); font-weight: bold; }
+    .day.heat-1 { background: rgba(200,240,96,.12); }
+    .day.heat-2 { background: rgba(200,240,96,.25); }
+    .day.heat-3 { background: rgba(200,240,96,.40); }
+    .day.heat-4 { background: rgba(200,240,96,.60); }
+    .day.heat-5 { background: rgba(200,240,96,.80); border-color: var(--accent); }
+    .day.mine { border-color: var(--accent) !important; }
+    .day-dots { display: flex; gap: 2px; flex-wrap: wrap; justify-content: center; max-width: 36px; }
+    .dot { width: 5px; height: 5px; border-radius: 50%; }
 
-    #best-list { display: flex; flex-direction: column; gap: 8px; }
-    .best-item { display: flex; justify-content: space-between; align-items: center; background: var(--surface2); padding: 10px 15px; border-radius: 10px; font-size: 0.9rem; }
+    /* ── 툴팁(팝업) 스타일 추가 ── */
+    #tooltip {
+      display: none;
+      position: fixed; /* 뷰포트 기준 */
+      z-index: 1000;
+      background: #1e1e26;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      width: 160px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: auto;
+    }
+    /* 툴팁 화살표 */
+    #tooltip::after {
+      content: "";
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 8px solid #1e1e26;
+    }
+    .tooltip-date { font-family: 'Black Han Sans', sans-serif; font-size: 0.9rem; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+    .tooltip-list { display: flex; flex-direction: column; gap: 4px; max-height: 100px; overflow-y: auto; }
+    .tooltip-user { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; }
+    .tooltip-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .tooltip-btn { width: 100%; padding: 6px; font-size: 0.75rem; border-radius: 6px; margin-top: 4px; }
+
+    .members-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .member-chip { display: flex; align-items: center; gap: 6px; background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; font-size: .85rem; }
+    .member-dot { width: 9px; height: 9px; border-radius: 50%; }
+    .member-me { border-color: var(--accent); color: var(--accent); }
+    .best-list { display: flex; flex-direction: column; gap: 8px; }
+    .best-item { display: flex; align-items: center; justify-content: space-between; background: var(--surface2); border-radius: 10px; padding: 10px 16px; font-size: .9rem; }
+    .best-count { font-family: 'Black Han Sans', sans-serif; font-size: 1rem; color: var(--accent); }
+    #status { text-align: center; font-size: .82rem; color: var(--muted); min-height: 20px; }
+    @media (max-width: 480px) { .day { font-size: .72rem; } .cal-grid { gap: 3px; } }
   </style>
 </head>
 <body>
 
-<header><h1>언제만날까 🗓️</h1></header>
+<header>
+  <h1>언제만날까 🗓️</h1>
+  <p>친구들과 가능한 날짜를 공유하고 최적의 날을 찾아봐요</p>
+</header>
 
 <main>
   <div class="card" id="setup-card">
-    <div class="card-title">방 만들기 / 참여</div>
+    <div class="card-title">👤 이름 입력 & 방 만들기</div>
     <div class="setup-row">
-      <input id="name-input" type="text" placeholder="내 이름"/>
-      <input id="room-input" type="text" placeholder="방 이름 (새로 만들때)"/>
-      <button onclick="createRoom()">시작</button>
-      <button class="secondary" onclick="joinRoom()">참여</button>
+      <input id="name-input" type="text" placeholder="내 이름 (예: 김철수)" maxlength="12"/>
+      <input id="room-input" type="text" placeholder="방 이름 (새로 만들 때)" maxlength="20"/>
+      <button onclick="createRoom()">방 만들기</button>
+      <button class="secondary" onclick="joinRoom()">기존 방 참여</button>
     </div>
   </div>
 
   <div class="share-banner" id="share-banner">
+    <span style="color:var(--muted);font-size:.82rem;white-space:nowrap">🔗 공유 링크</span>
     <span class="share-url" id="share-url"></span>
-    <button class="secondary" style="padding: 8px 12px;" onclick="copyLink()">복사</button>
+    <button class="copy-btn" onclick="copyLink()">복사</button>
   </div>
 
   <div class="card" id="cal-card" style="display:none">
     <div class="cal-nav">
-      <button class="secondary" onclick="changeMonth(-1)">◀</button>
+      <button onclick="changeMonth(-1)">◀</button>
       <span class="cal-month" id="cal-month-label"></span>
-      <button class="secondary" onclick="changeMonth(1)">▶</button>
+      <button onclick="changeMonth(1)">▶</button>
     </div>
-    <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-grid" id="cal-grid">
+      <div id="tooltip">
+        <div class="tooltip-date" id="tooltip-date"></div>
+        <div class="tooltip-list" id="tooltip-list"></div>
+        <button id="tooltip-btn" class="tooltip-btn" onclick="handleToggleClick()"></button>
+      </div>
+    </div>
+    <p style="margin-top:14px;font-size:.78rem;color:var(--muted)">날짜를 클릭해 누가 가능한지 확인하고 선택하세요!</p>
+  </div>
+
+  <div class="card" id="members-card" style="display:none">
+    <div class="card-title">👥 참여중인 친구들</div>
+    <div class="members-list" id="members-list"></div>
   </div>
 
   <div class="card" id="best-card" style="display:none">
-    <div class="card-title">🏆 가장 많이 모이는 날</div>
-    <div id="best-list"></div>
+    <div class="card-title">🏆 모두가 가능한 날 TOP 5</div>
+    <div class="best-list" id="best-list"></div>
   </div>
-</main>
 
-<div id="tooltip">
-  <div class="tooltip-date" id="tooltip-date"></div>
-  <div class="tooltip-who-list" id="tooltip-who"></div>
-  <div class="tooltip-btns">
-    <button class="secondary" onclick="closeTooltip()">닫기</button>
-    <button id="tooltip-toggle-btn" onclick="tooltipToggle()"></button>
-  </div>
-</div>
+  <div id="status"></div>
+</main>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -121,145 +241,166 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-let myName='', roomId='', roomData={}, viewYear, viewMonth, tooltipDateStr='';
-const COLORS = ['#c8f060','#60f0c8','#f0c860','#f060a8','#60a8f0','#a860f0','#f09060'];
+let myName = '';
+let roomId = '';
+let myColor = '';
+let viewYear, viewMonth;
+let roomData = {};
+let selectedDateForTooltip = null; // 현재 툴팁이 가리키는 날짜
+
+const COLORS = ['#c8f060','#60f0c8','#f0c860','#f060a8','#60a8f0','#a860f0','#f09060','#60f090'];
 
 window.createRoom = async function() {
-  const name = document.getElementById('name-input').value.trim();
-  const rname = document.getElementById('room-input').value.trim() || '우리의 약속';
-  if(!name) return alert('이름을 써주세요!');
-  roomId = Math.random().toString(36).slice(2,8).toUpperCase();
-  myName = name;
-  await set(ref(db, `rooms/${roomId}`), { name: rname, members: { [name]: { color: COLORS[0], dates: {} } } });
-  initRoom();
-}
+  try {
+    const name = document.getElementById('name-input').value.trim();
+    const rname = document.getElementById('room-input').value.trim() || '우리의 약속';
+    if (!name) { alert('이름을 입력해주세요!'); return; }
+    status('방 만드는 중...');
+    const nameKey = rname.replace(/[.#$[\]]/g, '_');
+    const nameIndexRef = ref(db, `roomNames/${nameKey}`);
+    const nameSnap = await get(nameIndexRef);
+    if (nameSnap.exists()) { alert(`방이 이미 존재해요!`); status(''); return; }
+    myName = name; roomId = Math.random().toString(36).slice(2,8).toUpperCase(); myColor = COLORS[0];
+    await set(nameIndexRef, roomId);
+    await set(ref(db, `rooms/${roomId}`), { name: rname, createdAt: Date.now(), members: { [myName]: { color: myColor, dates: {} } } });
+    initRoom();
+  } catch(e) { alert('오류 발생: ' + e.message); status(''); }
+};
 
 window.joinRoom = async function() {
   const name = document.getElementById('name-input').value.trim();
+  const rname = document.getElementById('room-input').value.trim();
+  if (!name) { alert('이름을 입력해주세요!'); return; }
   const urlRoom = new URLSearchParams(location.search).get('r');
-  if(!name) return alert('이름을 입력해주세요!');
-  if(!urlRoom) return alert('링크를 통해 접속해주세요!');
-  myName = name; roomId = urlRoom;
+  if (urlRoom) { roomId = urlRoom; } 
+  else if (rname) {
+    const nameKey = rname.replace(/[.#$[\]]/g, '_');
+    const nameSnap = await get(ref(db, `roomNames/${nameKey}`));
+    if (!nameSnap.exists()) { alert(`방을 찾을 수 없어요.`); return; }
+    roomId = nameSnap.val();
+  } else { alert('방 이름을 입력하거나 링크로 접속하세요!'); return; }
+  myName = name;
   const snap = await get(ref(db, `rooms/${roomId}`));
-  if(!snap.exists()) return alert('방을 찾을 수 없습니다.');
-  if(!snap.val().members[name]) {
-    const color = COLORS[Object.keys(snap.val().members).length % COLORS.length];
-    await update(ref(db, `rooms/${roomId}/members/${name}`), { color, dates: {} });
+  if (!snap.exists()) return;
+  const members = snap.val().members || {};
+  if (members[myName]) { myColor = members[myName].color; } 
+  else {
+    const usedColors = Object.values(members).map(m => m.color);
+    myColor = COLORS.find(c => !usedColors.includes(c)) || COLORS[Object.keys(members).length % COLORS.length];
+    await update(ref(db, `rooms/${roomId}/members/${myName}`), { color: myColor, dates: {} });
   }
   initRoom();
-}
+};
 
 function initRoom() {
   const d = new Date(); viewYear = d.getFullYear(); viewMonth = d.getMonth();
   document.getElementById('setup-card').style.display = 'none';
   document.getElementById('cal-card').style.display = 'block';
+  document.getElementById('members-card').style.display = 'block';
   document.getElementById('best-card').style.display = 'block';
+  document.getElementById('share-url').textContent = `${location.origin}${location.pathname}?r=${roomId}`;
   document.getElementById('share-banner').classList.add('visible');
-  document.getElementById('share-url').textContent = location.href.split('?')[0] + '?r=' + roomId;
-  history.replaceState({}, '', '?r=' + roomId);
-  onValue(ref(db, `rooms/${roomId}`), snap => { 
-    if(snap.exists()){ roomData=snap.val(); renderCalendar(); renderBest(); }
+  history.replaceState({}, '', `?r=${roomId}`);
+  onValue(ref(db, `rooms/${roomId}`), snap => {
+    if (!snap.exists()) return;
+    roomData = snap.val();
+    renderCalendar(); renderMembers(); renderBest();
+    if(selectedDateForTooltip) updateTooltip(selectedDateForTooltip); // 데이터 갱신 시 툴팁도 갱신
   });
+  status('실시간 연결됨 ✅');
 }
 
+window.changeMonth = function(delta) {
+  viewMonth += delta;
+  if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+  if (viewMonth < 0)  { viewMonth = 11; viewYear--; }
+  hideTooltip();
+  renderCalendar();
+};
+
 function renderCalendar() {
-  const grid = document.getElementById('cal-grid'); grid.innerHTML = '';
   document.getElementById('cal-month-label').textContent = `${viewYear}년 ${viewMonth+1}월`;
+  const grid = document.getElementById('cal-grid');
+  // 툴팁 제외하고 비우기
+  const tooltip = document.getElementById('tooltip');
+  grid.innerHTML = '';
+  grid.appendChild(tooltip);
+
   ['일','월','화','수','목','금','토'].forEach(d => {
-    const el = document.createElement('div'); el.className='cal-dow'; el.textContent=d; grid.appendChild(el);
+    const el = document.createElement('div'); el.className = 'cal-dow'; el.textContent = d; grid.appendChild(el);
   });
+
   const first = new Date(viewYear, viewMonth, 1).getDay();
   const total = new Date(viewYear, viewMonth+1, 0).getDate();
   const members = roomData.members || {};
   
-  for(let i=0; i<first; i++) grid.appendChild(document.createElement('div')).className='day empty';
-  
-  for(let d=1; d<=total; d++) {
+  const countMap = {}; const whoMap = {};
+  Object.entries(members).forEach(([name, m]) => {
+    Object.keys(m.dates || {}).forEach(dk => {
+      if (m.dates[dk]) {
+        countMap[dk] = (countMap[dk] || 0) + 1;
+        if (!whoMap[dk]) whoMap[dk] = [];
+        whoMap[dk].push({ name, color: m.color });
+      }
+    });
+  });
+  const maxCount = Math.max(1, ...Object.values(countMap));
+
+  for (let i = 0; i < first; i++) grid.appendChild(document.createElement('div')).className = 'day empty';
+
+  for (let d = 1; d <= total; d++) {
     const ds = `${viewYear}-${String(viewMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const who = Object.entries(members).filter(([,m])=>m.dates?.[ds]).map(([n,m])=>m.color);
+    const isPast = ds < today();
+    const isMine = !!(members[myName]?.dates?.[ds]);
+    const count = countMap[ds] || 0;
+    const heat = count === 0 ? 0 : Math.ceil((count / maxCount) * 5);
+
     const el = document.createElement('div');
-    el.className = 'day' + (ds === today() ? ' today':'') + (members[myName]?.dates?.[ds] ? ' mine':'');
-    if(who.length > 0) el.classList.add('heat-' + Math.min(5, who.length));
-    el.innerHTML = `<div>${d}</div><div class="day-dots">${who.map(c=>`<div class="dot" style="background:${c}"></div>`).join('')}</div>`;
-    el.onclick = (e) => { e.stopPropagation(); openTooltip(ds, el); };
+    el.className = `day ${isPast?'past':''} ${ds===today()?'today':''} ${isMine?'mine':''} ${heat?`heat-${heat}`:''}`;
+    el.innerHTML = `<div class="day-num">${d}</div>`;
+    
+    if (count > 0) {
+      const dots = document.createElement('div'); dots.className = 'day-dots';
+      whoMap[ds].forEach(w => {
+        const dot = document.createElement('div'); dot.className = 'dot'; dot.style.background = w.color; dots.appendChild(dot);
+      });
+      el.appendChild(dots);
+    }
+
+    if (!isPast) {
+      el.onclick = (e) => {
+        e.stopPropagation();
+        showTooltip(ds, el);
+      };
+    }
     grid.appendChild(el);
   }
 }
 
-window.openTooltip = function(ds, el) {
-  tooltipDateStr = ds;
-  const t = document.getElementById('tooltip');
+// ── 툴팁 관련 함수 ──
+function showTooltip(dateStr, targetEl) {
+  selectedDateForTooltip = dateStr;
+  const tooltip = document.getElementById('tooltip');
+  
+  // 위치 계산
+  const rect = targetEl.getBoundingClientRect();
+  tooltip.style.display = 'flex';
+  tooltip.style.left = `${rect.left + window.scrollX + rect.width/2 - 80}px`;
+  tooltip.style.top = `${rect.top + window.scrollY - tooltip.offsetHeight - 10}px`;
+
+  updateTooltip(dateStr);
+}
+
+function updateTooltip(dateStr) {
   const members = roomData.members || {};
-  const isMine = !!members[myName]?.dates?.[ds];
+  const dsParts = dateStr.split('-');
+  document.getElementById('tooltip-date').textContent = `${dsParts[1]}월 ${dsParts[2]}일`;
+
+  const listEl = document.getElementById('tooltip-list');
+  listEl.innerHTML = '';
   
-  document.getElementById('tooltip-date').textContent = ds;
-  const whoList = Object.entries(members).filter(([,m])=>m.dates?.[ds]);
-  document.getElementById('tooltip-who').innerHTML = whoList.length 
-    ? whoList.map(([n,m])=>`<div class="tooltip-person"><div class="tooltip-dot" style="background:${m.color}"></div>${n}</div>`).join('')
-    : '<div style="font-size:0.75rem;color:#888;text-align:center;">가능한 사람 없음</div>';
-  
-  const btn = document.getElementById('tooltip-toggle-btn');
-  btn.textContent = isMine ? '취소할게요' : '나도 가능!';
-  btn.style.background = isMine ? 'var(--danger)' : 'var(--accent)';
-  btn.style.color = isMine ? '#fff' : '#000';
-
-  t.style.display = 'flex';
-  const rect = el.getBoundingClientRect();
-  
-  // FIXED 기준 좌표 계산 (스크롤 영향 받지 않음)
-  const leftPos = rect.left + rect.width/2 - t.offsetWidth/2;
-  const topPos = rect.top - t.offsetHeight - 12;
-  
-  t.style.left = Math.max(10, Math.min(leftPos, window.innerWidth - t.offsetWidth - 10)) + 'px';
-  t.style.top = topPos + 'px';
-};
-
-window.closeTooltip = () => document.getElementById('tooltip').style.display = 'none';
-
-window.tooltipToggle = async function() {
-  const current = !!roomData.members[myName]?.dates?.[tooltipDateStr];
-  await update(ref(db, `rooms/${roomId}/members/${myName}/dates`), { [tooltipDateStr]: !current });
-  closeTooltip();
-}
-
-function renderBest() {
-  const counts = {};
-  Object.values(roomData.members).forEach(m => {
-    Object.keys(m.dates || {}).forEach(d => { if(m.dates[d]) counts[d] = (counts[d]||0)+1; });
-  });
-  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  const list = document.getElementById('best-list');
-  list.innerHTML = sorted.length ? sorted.map(([d,c])=>`
-    <div class="best-item">
-      <span>${d}</span>
-      <b style="color:var(--accent)">${c}명 가능</b>
-    </div>`).join('') : '<p style="text-align:center;color:#888;font-size:0.8rem;">날짜를 선택해보세요!</p>';
-}
-
-window.copyLink = () => {
-  const url = document.getElementById('share-url').textContent;
-  navigator.clipboard.writeText(url).then(() => alert('링크가 복사되었습니다!'));
-}
-
-window.changeMonth = (n) => {
-  viewMonth += n;
-  if(viewMonth > 11) { viewMonth = 0; viewYear++; }
-  else if(viewMonth < 0) { viewMonth = 11; viewYear--; }
-  closeTooltip();
-  renderCalendar();
-}
-
-function today() { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
-
-document.addEventListener('click', (e) => { if(!e.target.closest('#tooltip') && !e.target.closest('.day')) closeTooltip(); });
-
-window.onload = () => {
-  const r = new URLSearchParams(location.search).get('r');
-  if(r) {
-    document.getElementById('room-input').style.display = 'none';
-    document.querySelector('button[onclick="createRoom()"]').style.display = 'none';
-  }
-}
-</script>
-</body>
-</html>
+  const whoList = Object.entries(members).filter(([, m]) => m.dates?.[dateStr]);
+  if (whoList.length === 0) {
+    listEl.innerHTML = '<div style="font-size:0.7rem;color:var(--muted)">가능한 친구 없음</div>';
+  } else {
+    whoList
