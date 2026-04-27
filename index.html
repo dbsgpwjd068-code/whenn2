@@ -1,127 +1,310 @@
+cat > /mnt/user-data/outputs/when-we-meet.html << 'HTMLEOF'
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>언제만날까 🗓️</title>
   <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Black+Han+Sans&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --bg: #0d0d0f; --surface: #18181c; --surface2: #222228; --border: #2e2e38;
-      --accent: #c8f060; --accent2: #60f0c8; --text: #f0f0f0; --muted: #888; --danger: #f06060;
+      --bg: #0d0d0f;
+      --surface: #18181c;
+      --surface2: #222228;
+      --border: #2e2e38;
+      --accent: #c8f060;
+      --accent2: #60f0c8;
+      --text: #f0f0f0;
+      --muted: #888;
+      --danger: #f06060;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: 'Gowun Dodum', sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
-
-    /* ── HEADER ── */
-    header { width: 100%; padding: 50px 20px 35px; text-align: center; border-bottom: 1px solid var(--border); position: relative; }
-    header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 120% at 50% -20%, rgba(200,240,96,.15) 0%, transparent 75%); pointer-events: none; }
-    header h1 { font-family: 'Black Han Sans', sans-serif; font-size: 3rem; color: var(--accent); letter-spacing: -1px; }
-    header p { margin-top: 10px; color: var(--muted); font-size: 1rem; }
-
-    main { width: 100%; max-width: 800px; padding: 30px 20px 80px; display: flex; flex-direction: column; gap: 25px; }
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 28px; transition: transform 0.3s ease; }
-    .card-title { font-family: 'Black Han Sans', sans-serif; font-size: 1.1rem; color: var(--accent); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
-
-    /* ── SETUP ── */
-    .setup-row { display: flex; gap: 12px; flex-wrap: wrap; }
-    .setup-row input { flex: 1; min-width: 200px; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; color: var(--text); outline: none; font-size: 1rem; }
-    .setup-row input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(200,240,96,0.1); }
-    button { background: var(--accent); color: #000; border: none; border-radius: 12px; padding: 14px 24px; font-family: 'Black Han Sans', sans-serif; cursor: pointer; transition: 0.2s; white-space: nowrap; }
-    button:hover { opacity: 0.9; transform: translateY(-1px); }
-    button.secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-
-    /* ── CALENDAR ── */
-    .cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .cal-month { font-family: 'Black Han Sans', sans-serif; font-size: 1.3rem; }
-    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-    .cal-dow { text-align: center; font-size: 0.75rem; color: var(--muted); padding-bottom: 10px; font-weight: bold; }
-    .day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; border: 2px solid transparent; cursor: pointer; position: relative; background: var(--surface2); transition: 0.2s; }
-    .day:hover { background: #2a2a32; }
-    .day.past { opacity: 0.2; cursor: not-allowed; pointer-events: none; }
-    .day.today { border-color: #444; }
-    .day.today .day-num { color: var(--accent); font-weight: bold; }
-    .day.mine { border-color: var(--accent) !important; box-shadow: 0 0 10px rgba(200,240,96,0.15); }
-    
-    /* Heatmap */
-    .day.heat-1 { background: rgba(200,240,96,0.1); }
-    .day.heat-2 { background: rgba(200,240,96,0.25); }
-    .day.heat-3 { background: rgba(200,240,96,0.45); }
-    .day.heat-4 { background: rgba(200,240,96,0.65); }
-    .day.heat-5 { background: rgba(200,240,96,0.85); border-color: var(--accent); }
-    .day.heat-5 .day-num { color: #000; font-weight: bold; }
-
-    .day-dots { display: flex; gap: 3px; flex-wrap: wrap; justify-content: center; position: absolute; bottom: 6px; width: 100%; padding: 0 4px; }
-    .dot { width: 6px; height: 6px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.2); }
-
-    /* ── POPUP TOOLTIP (핵심 수정 사항) ── */
-    #tooltip {
-      display: none; position: fixed; z-index: 10000;
-      background: #25252d; border: 1px solid var(--border); border-radius: 18px;
-      padding: 16px; width: 200px; box-shadow: 0 15px 50px rgba(0,0,0,0.8);
-      flex-direction: column; gap: 12px;
-      animation: popupScale 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Gowun Dodum', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    @keyframes popupScale { from { opacity: 0; transform: scale(0.9) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-    
-    #tooltip::after { content: ""; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 10px solid #25252d; }
-    .tt-header { font-family: 'Black Han Sans', sans-serif; color: var(--accent); font-size: 1rem; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
-    .tt-list { max-height: 120px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin: 4px 0; }
-    .tt-user { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; font-weight: 500; }
-    .tt-dot { width: 10px; height: 10px; border-radius: 50%; }
-    .tt-btn { width: 100%; padding: 12px; font-family: 'Black Han Sans', sans-serif; border-radius: 10px; border: none; cursor: pointer; transition: 0.2s; }
+    header {
+      width: 100%;
+      padding: 40px 20px 28px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 120% at 50% -20%, rgba(200,240,96,.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    header h1 {
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      letter-spacing: -1px;
+      color: var(--accent);
+      position: relative;
+    }
+    header p { margin-top: 6px; color: var(--muted); font-size: .95rem; position: relative; }
+    main {
+      width: 100%;
+      max-width: 860px;
+      padding: 28px 20px 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    .card-title {
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: 1.05rem;
+      color: var(--accent);
+      margin-bottom: 16px;
+      letter-spacing: .5px;
+    }
+    .setup-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .setup-row input {
+      flex: 1; min-width: 160px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 16px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: .95rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .setup-row input:focus { border-color: var(--accent); }
+    .setup-row input::placeholder { color: var(--muted); }
+    button {
+      background: var(--accent);
+      color: #0d0d0f;
+      border: none;
+      border-radius: 10px;
+      padding: 11px 22px;
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: .95rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity .15s, transform .1s;
+    }
+    button:hover { opacity: .85; }
+    button:active { transform: scale(.97); }
+    button.secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .share-banner {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+    }
+    .share-banner.visible { display: flex; }
+    .share-url { flex: 1; font-size: .82rem; color: var(--accent2); word-break: break-all; }
+    .copy-btn {
+      background: var(--surface);
+      color: var(--accent2);
+      border: 1px solid var(--accent2);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: .82rem;
+      cursor: pointer;
+    }
+    .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .cal-month { font-family: 'Black Han Sans', sans-serif; font-size: 1.15rem; color: var(--text); }
+    .cal-nav button { background: var(--surface2); color: var(--text); border: 1px solid var(--border); padding: 7px 14px; border-radius: 8px; }
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+      position: relative;
+    }
+    .cal-dow { text-align: center; font-size: .72rem; color: var(--muted); padding: 4px 0 8px; letter-spacing: .5px; }
+    .cal-dow:first-child { color: #f08080; }
+    .cal-dow:last-child { color: #80a0f0; }
+    .day {
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      position: relative;
+      transition: background .15s, border-color .15s;
+      font-size: .85rem;
+      user-select: none;
+      gap: 2px;
+    }
+    .day:hover:not(.empty):not(.past) { border-color: var(--border); background: var(--surface2); }
+    .day.empty { cursor: default; }
+    .day.past { opacity: .3; cursor: not-allowed; }
+    .day.today .day-num { color: var(--accent); font-weight: bold; }
+    .day-num { line-height: 1; }
+    .day.heat-1 { background: rgba(200,240,96,.12); }
+    .day.heat-2 { background: rgba(200,240,96,.25); }
+    .day.heat-3 { background: rgba(200,240,96,.40); }
+    .day.heat-4 { background: rgba(200,240,96,.60); }
+    .day.heat-5 { background: rgba(200,240,96,.80); border-color: var(--accent); }
+    .day.mine { border-color: var(--accent) !important; }
+    .day-dots { display: flex; gap: 2px; flex-wrap: wrap; justify-content: center; max-width: 36px; }
+    .dot { width: 5px; height: 5px; border-radius: 50%; }
 
-    /* ── OTHER UI ── */
-    .member-chip { display: flex; align-items: center; gap: 8px; background: var(--surface2); border: 1px solid var(--border); border-radius: 50px; padding: 8px 16px; font-size: 0.9rem; }
-    .member-dot { width: 10px; height: 10px; border-radius: 50%; }
-    .member-me { border: 1px solid var(--accent); color: var(--accent); }
-    .best-item { display: flex; justify-content: space-between; align-items: center; background: var(--surface2); padding: 15px 20px; border-radius: 15px; border: 1px solid var(--border); }
-    .best-count { font-family: 'Black Han Sans', sans-serif; color: var(--accent); font-size: 1.2rem; }
+    /* ── TOOLTIP ── */
+    .tooltip {
+      display: none;
+      position: absolute;
+      z-index: 300;
+      background: #1e1e26;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      width: 180px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.8);
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: auto;
+    }
+    .tooltip.visible { display: flex; }
+    .tooltip::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 8px solid #1e1e26;
+    }
+    .tooltip::before {
+      content: '';
+      position: absolute;
+      bottom: -9px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 9px solid transparent;
+      border-right: 9px solid transparent;
+      border-top: 9px solid var(--border);
+    }
+    .tooltip-date {
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: .9rem;
+      color: var(--accent);
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .tooltip-person {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: .82rem;
+    }
+    .tooltip-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .tooltip-empty { font-size: .8rem; color: var(--muted); text-align: center; padding: 2px 0; }
+    .tooltip-btns { display: flex; gap: 6px; margin-top: 2px; }
+    .tooltip-btns button { flex: 1; padding: 8px 4px; font-size: .78rem; border-radius: 8px; }
+    .btn-remove { background: var(--danger) !important; color: #fff !important; }
+
+    .members-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .member-chip {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: .85rem;
+    }
+    .member-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .member-me { border-color: var(--accent); color: var(--accent); }
+    .best-list { display: flex; flex-direction: column; gap: 8px; }
+    .best-item {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--surface2);
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: .9rem;
+    }
+    .best-item-left { display: flex; flex-direction: column; gap: 3px; }
+    .best-item-names { font-size: .75rem; color: var(--muted); }
+    .best-count { font-family: 'Black Han Sans', sans-serif; font-size: 1rem; color: var(--accent); }
+    #status { text-align: center; font-size: .82rem; color: var(--muted); min-height: 20px; }
+    @media (max-width: 480px) {
+      .day { font-size: .72rem; border-radius: 7px; }
+      .cal-grid { gap: 3px; }
+    }
   </style>
 </head>
 <body>
 
 <header>
   <h1>언제만날까 🗓️</h1>
-  <p>최적의 모임 날짜를 찾는 가장 쉬운 방법</p>
+  <p>친구들과 가능한 날짜를 공유하고 최적의 날을 찾아봐요</p>
 </header>
 
 <main>
   <div class="card" id="setup-card">
-    <div class="card-title">🚀 시작하기</div>
+    <div class="card-title">👤 이름 입력 & 방 만들기</div>
     <div class="setup-row">
-      <input id="name-input" type="text" placeholder="본인 이름 입력" maxlength="12"/>
-      <input id="room-input" type="text" placeholder="방 제목 입력" maxlength="20"/>
+      <input id="name-input" type="text" placeholder="내 이름 (예: 김철수)" maxlength="12"/>
+      <input id="room-input" type="text" placeholder="방 이름 (새로 만들 때)" maxlength="20"/>
       <button onclick="createRoom()">방 만들기</button>
-      <button class="secondary" onclick="joinRoom()">참여하기</button>
+      <button class="secondary" onclick="joinRoom()">기존 방 참여</button>
     </div>
+    <p style="margin-top:10px;font-size:.8rem;color:var(--muted)">이미 링크를 받았다면 이름만 입력하고 <b>기존 방 참여</b>를 누르세요</p>
+    <p style="margin-top:8px;font-size:.8rem;color:var(--danger)">⚠️ 중복 방은 허용되지 않아요. 기존 방에 들어가려면 <b>닉네임 + 방 이름</b>이 똑같아야 해요!</p>
+  </div>
+
+  <div class="share-banner" id="share-banner">
+    <span style="color:var(--muted);font-size:.82rem;white-space:nowrap">🔗 공유 링크</span>
+    <span class="share-url" id="share-url"></span>
+    <button class="copy-btn" onclick="copyLink()">복사</button>
   </div>
 
   <div class="card" id="cal-card" style="display:none">
     <div class="cal-nav">
-      <button class="secondary" onclick="changeMonth(-1)">이전 달</button>
+      <button onclick="changeMonth(-1)">◀</button>
       <span class="cal-month" id="cal-month-label"></span>
-      <button class="secondary" onclick="changeMonth(1)">다음 달</button>
+      <button onclick="changeMonth(1)">▶</button>
     </div>
-    <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-grid" id="cal-grid">
+      <div class="tooltip" id="tooltip">
+        <div class="tooltip-date" id="tooltip-date"></div>
+        <div id="tooltip-who"></div>
+        <div class="tooltip-btns">
+          <button class="secondary" onclick="closeTooltip()">닫기</button>
+          <button id="tooltip-toggle-btn" onclick="tooltipToggle()"></button>
+        </div>
+      </div>
+    </div>
+    <p style="margin-top:14px;font-size:.78rem;color:var(--muted)">날짜를 탭하면 누가 가능한지 볼 수 있어요. 색이 진할수록 많은 친구가 가능한 날이에요.</p>
   </div>
 
   <div class="card" id="members-card" style="display:none">
-    <div class="card-title">👥 참여 중인 멤버</div>
-    <div id="members-list" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
+    <div class="card-title">👥 참여중인 친구들</div>
+    <div class="members-list" id="members-list"></div>
   </div>
 
   <div class="card" id="best-card" style="display:none">
-    <div class="card-title">🏆 추천 날짜</div>
-    <div id="best-list" style="display:flex; flex-direction:column; gap:12px;"></div>
+    <div class="card-title">🏆 모두가 가능한 날 TOP 5</div>
+    <div class="best-list" id="best-list"></div>
   </div>
-</main>
 
-<div id="tooltip">
-  <div class="tt-header" id="tt-date"></div>
-  <div class="tt-list" id="tt-list"></div>
-  <button id="tt-btn" class="tt-btn" onclick="handleToggle()"></button>
-</div>
+  <div id="status"></div>
+</main>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -140,133 +323,301 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-let myName='', roomId='', myColor='', viewYear, viewMonth, roomData={}, activeDate='';
+let myName = '', roomId = '', myColor = '';
+let viewYear, viewMonth;
+let roomData = {};
+let tooltipDateStr = '';
+
 const COLORS = ['#c8f060','#60f0c8','#f0c860','#f060a8','#60a8f0','#a860f0','#f09060','#60f090'];
 
-// 방 생성
-window.createRoom = async () => {
-  const n = document.getElementById('name-input').value.trim();
-  const rn = document.getElementById('room-input').value.trim() || '우리의 약속';
-  if(!n) return alert('이름을 입력하세요!');
-  roomId = Math.random().toString(36).slice(2,8).toUpperCase();
-  myName = n; myColor = COLORS[0];
-  await set(ref(db, `rooms/${roomId}`), { name: rn, members: { [n]: { color: myColor, dates: {} } } });
-  startApp();
+function uid() { return Math.random().toString(36).slice(2,8).toUpperCase(); }
+function today() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function status(msg) { document.getElementById('status').textContent = msg; }
+
+window.createRoom = async function() {
+  try {
+    const name = document.getElementById('name-input').value.trim();
+    const rname = document.getElementById('room-input').value.trim() || '우리의 약속';
+    if (!name) { alert('이름을 입력해주세요!'); return; }
+    status('방 만드는 중...');
+    const nameKey = rname.replace(/[.#$[\]]/g, '_');
+    const nameIndexRef = ref(db, `roomNames/${nameKey}`);
+    const nameSnap = await get(nameIndexRef);
+    if (nameSnap.exists()) {
+      alert(`"${rname}" 방이 이미 존재해요! 다른 이름을 사용해주세요 😅`);
+      status(''); return;
+    }
+    myName = name; roomId = uid(); myColor = COLORS[0];
+    await set(nameIndexRef, roomId);
+    await set(ref(db, `rooms/${roomId}`), {
+      name: rname, createdAt: Date.now(),
+      members: { [myName]: { color: myColor, dates: {} } }
+    });
+    initRoom();
+  } catch(e) { alert('오류 발생: ' + e.message); status(''); }
 };
 
-// 방 참여
-window.joinRoom = async () => {
-  const n = document.getElementById('name-input').value.trim();
-  const urlParams = new URLSearchParams(location.search);
-  roomId = urlParams.get('r') || roomId;
-  if(!n || !roomId) return alert('이름과 방 정보가 필요합니다!');
-  myName = n;
+window.joinRoom = async function() {
+  const name = document.getElementById('name-input').value.trim();
+  const rname = document.getElementById('room-input').value.trim();
+  if (!name) { alert('이름을 입력해주세요!'); return; }
+  const urlRoom = new URLSearchParams(location.search).get('r');
+  if (urlRoom) {
+    roomId = urlRoom;
+  } else if (rname) {
+    const nameKey = rname.replace(/[.#$[\]]/g, '_');
+    const nameSnap = await get(ref(db, `roomNames/${nameKey}`));
+    if (!nameSnap.exists()) { alert(`"${rname}" 방을 찾을 수 없어요!`); return; }
+    roomId = nameSnap.val();
+  } else {
+    alert('방 이름을 입력하거나 공유 링크로 접속해주세요!'); return;
+  }
+  myName = name;
   const snap = await get(ref(db, `rooms/${roomId}`));
-  if(!snap.exists()) return alert('방이 존재하지 않습니다.');
-  const m = snap.val().members || {};
-  if(!m[n]) {
-    myColor = COLORS[Object.keys(m).length % COLORS.length];
-    await update(ref(db, `rooms/${roomId}/members/${n}`), { color: myColor, dates: {} });
-  } else { myColor = m[n].color; }
-  startApp();
+  if (!snap.exists()) { alert('방을 찾을 수 없어요.'); return; }
+  const members = snap.val().members || {};
+  if (members[myName]) {
+    myColor = members[myName].color;
+    initRoom(); return;
+  }
+  const usedColors = Object.values(members).map(m => m.color);
+  myColor = COLORS.find(c => !usedColors.includes(c)) || COLORS[Object.keys(members).length % COLORS.length];
+  await update(ref(db, `rooms/${roomId}/members/${myName}`), { color: myColor, dates: {} });
+  initRoom();
 };
 
-function startApp() {
-  const d = new Date(); viewYear = d.getFullYear(); viewMonth = d.getMonth();
+function initRoom() {
+  const d = new Date();
+  viewYear = d.getFullYear(); viewMonth = d.getMonth();
   document.getElementById('setup-card').style.display = 'none';
-  ['cal-card','members-card','best-card'].forEach(id => document.getElementById(id).style.display = 'block');
-  history.replaceState({}, '', '?r=' + roomId);
+  document.getElementById('cal-card').style.display = 'block';
+  document.getElementById('members-card').style.display = 'block';
+  document.getElementById('best-card').style.display = 'block';
+  const shareUrl = `${location.origin}${location.pathname}?r=${roomId}`;
+  document.getElementById('share-url').textContent = shareUrl;
+  document.getElementById('share-banner').classList.add('visible');
+  history.replaceState({}, '', `?r=${roomId}`);
   onValue(ref(db, `rooms/${roomId}`), snap => {
-    if(snap.exists()) { roomData = snap.val(); render(); }
+    if (!snap.exists()) return;
+    roomData = snap.val();
+    renderCalendar();
+    renderMembers();
+    renderBest();
   });
+  status('실시간 연결됨 ✅');
 }
 
-function render() {
+window.changeMonth = function(delta) {
+  viewMonth += delta;
+  if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+  if (viewMonth < 0)  { viewMonth = 11; viewYear--; }
+  closeTooltip();
   renderCalendar();
-  renderMembers();
-  renderBest();
-  if(activeDate) updateTooltip();
-}
+};
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#tooltip') && !e.target.closest('.day')) closeTooltip();
+});
 
 function renderCalendar() {
-  document.getElementById('cal-month-label').textContent = `${viewYear}년 ${viewMonth+1}월`;
-  const grid = document.getElementById('cal-grid'); grid.innerHTML = '';
-  ['일','월','화','수','목','금','토'].forEach(d => grid.innerHTML += `<div class="cal-dow">${d}</div>`);
-  
-  const first = new Date(viewYear, viewMonth, 1).getDay();
-  const last = new Date(viewYear, viewMonth+1, 0).getDate();
-  const todayStr = new Date().toISOString().split('T')[0];
+  const grid = document.getElementById('cal-grid');
+  const tooltip = document.getElementById('tooltip');
+  grid.innerHTML = '';
+  grid.appendChild(tooltip);
 
-  for (let i = 0; i < first; i++) grid.innerHTML += `<div class="day empty" style="background:transparent; cursor:default;"></div>`;
-  
-  for (let d = 1; d <= last; d++) {
-    const ds = `${viewYear}-${String(viewMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const who = Object.entries(roomData.members || {}).filter(([,m]) => m.dates?.[ds]);
-    const isMine = !!roomData.members?.[myName]?.dates?.[ds];
-    
-    const dayEl = document.createElement('div');
-    dayEl.className = `day ${ds < todayStr ? 'past' : ''} ${ds === todayStr ? 'today' : ''} ${isMine ? 'mine' : ''} heat-${Math.min(5, who.length)}`;
-    dayEl.innerHTML = `<div class="day-num">${d}</div><div class="day-dots">${who.map(w=>`<div class="dot" style="background:${w[1].color}"></div>`).join('')}</div>`;
-    
-    dayEl.onclick = (e) => { e.stopPropagation(); openPopup(ds, dayEl); };
-    grid.appendChild(dayEl);
+  document.getElementById('cal-month-label').textContent = `${viewYear}년 ${viewMonth+1}월`;
+  ['일','월','화','수','목','금','토'].forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-dow'; el.textContent = d;
+    grid.appendChild(el);
+  });
+
+  const first = new Date(viewYear, viewMonth, 1).getDay();
+  const total = new Date(viewYear, viewMonth+1, 0).getDate();
+  const todayStr = today();
+  const members = roomData.members || {};
+  const myDates = (members[myName]?.dates) || {};
+  const countMap = {}, whoMap = {};
+  Object.entries(members).forEach(([name, m]) => {
+    Object.keys(m.dates || {}).forEach(dk => {
+      if (m.dates[dk]) {
+        countMap[dk] = (countMap[dk] || 0) + 1;
+        if (!whoMap[dk]) whoMap[dk] = [];
+        whoMap[dk].push({ name, color: m.color });
+      }
+    });
+  });
+  const maxCount = Math.max(1, ...Object.values(countMap));
+
+  for (let i = 0; i < first; i++) {
+    const el = document.createElement('div'); el.className = 'day empty';
+    grid.appendChild(el);
+  }
+  for (let d = 1; d <= total; d++) {
+    const dateStr = `${viewYear}-${String(viewMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isPast = dateStr < todayStr;
+    const isMine = !!myDates[dateStr];
+    const count = countMap[dateStr] || 0;
+    const heatLevel = count === 0 ? 0 : Math.ceil((count / maxCount) * 5);
+    const el = document.createElement('div');
+    el.className = 'day' + (isPast ? ' past' : '') + (dateStr === todayStr ? ' today' : '') +
+                   (isMine ? ' mine' : '') + (heatLevel ? ` heat-${heatLevel}` : '');
+    const numEl = document.createElement('div');
+    numEl.className = 'day-num'; numEl.textContent = d;
+    el.appendChild(numEl);
+    if (count > 0) {
+      const dots = document.createElement('div');
+      dots.className = 'day-dots';
+      (whoMap[dateStr] || []).forEach(w => {
+        const dot = document.createElement('div');
+        dot.className = 'dot'; dot.style.background = w.color;
+        dots.appendChild(dot);
+      });
+      el.appendChild(dots);
+    }
+    if (!isPast) {
+      el.onclick = (e) => { e.stopPropagation(); openTooltip(dateStr, el); };
+    }
+    grid.appendChild(el);
   }
 }
 
-function openPopup(ds, el) {
-  activeDate = ds;
-  const tt = document.getElementById('tooltip');
-  const rect = el.getBoundingClientRect();
-  tt.style.display = 'flex';
-  tt.style.top = `${rect.top + window.scrollY - tt.offsetHeight - 15}px`;
-  tt.style.left = `${rect.left + window.scrollX + (rect.width/2) - (tt.offsetWidth/2)}px`;
-  updateTooltip();
+function openTooltip(dateStr, dayEl) {
+  const tooltip = document.getElementById('tooltip');
+  const members = roomData.members || {};
+  const myDates = (members[myName]?.dates) || {};
+  const isMine = !!myDates[dateStr];
+  const [, mo, d] = dateStr.split('-');
+  const dow = ['일','월','화','수','목','금','토'][new Date(dateStr).getDay()];
+
+  tooltipDateStr = dateStr;
+  document.getElementById('tooltip-date').textContent = `${+mo}월 ${+d}일 (${dow})`;
+
+  const whoList = Object.entries(members)
+    .filter(([, m]) => m.dates?.[dateStr])
+    .map(([n, m]) => ({ name: n, color: m.color }));
+
+  const whoEl = document.getElementById('tooltip-who');
+  whoEl.innerHTML = '';
+  if (whoList.length === 0) {
+    whoEl.innerHTML = '<div class="tooltip-empty">아직 아무도 없어요</div>';
+  } else {
+    whoList.forEach(w => {
+      const row = document.createElement('div');
+      row.className = 'tooltip-person';
+      row.innerHTML = `<div class="tooltip-dot" style="background:${w.color}"></div><span>${w.name}${w.name === myName ? ' (나)' : ''}</span>`;
+      whoEl.appendChild(row);
+    });
+  }
+
+  const btn = document.getElementById('tooltip-toggle-btn');
+  if (isMine) {
+    btn.textContent = '취소 ❌';
+    btn.style.background = 'var(--danger)';
+    btn.style.color = '#fff';
+  } else {
+    btn.textContent = '가능! ✅';
+    btn.style.background = 'var(--accent)';
+    btn.style.color = '#0d0d0f';
+  }
+
+  // 날짜 셀 바로 위에 위치
+  tooltip.style.display = 'flex';
+  const grid = document.getElementById('cal-grid');
+  const gridRect = grid.getBoundingClientRect();
+  const dayRect = dayEl.getBoundingClientRect();
+  const tooltipW = 180;
+  let left = (dayRect.left - gridRect.left) + (dayRect.width / 2) - (tooltipW / 2);
+  left = Math.max(0, Math.min(left, gridRect.width - tooltipW));
+  const top = (dayRect.top - gridRect.top) - tooltip.offsetHeight - 14;
+  tooltip.style.left = left + 'px';
+  tooltip.style.top = top + 'px';
+  tooltip.style.width = tooltipW + 'px';
+  tooltip.classList.add('visible');
 }
 
-function updateTooltip() {
-  const ds = activeDate;
-  document.getElementById('tt-date').textContent = ds;
-  const who = Object.entries(roomData.members || {}).filter(([,m]) => m.dates?.[ds]);
-  document.getElementById('tt-list').innerHTML = who.length 
-    ? who.map(([n,m]) => `<div class="tt-user"><div class="tt-dot" style="background:${m.color}"></div><span>${n}</span></div>`).join('')
-    : `<div style="color:var(--muted); font-size:0.8rem; text-align:center;">선택한 사람 없음</div>`;
-  
-  const isMine = !!roomData.members[myName]?.dates?.[ds];
-  const btn = document.getElementById('tt-btn');
-  btn.textContent = isMine ? '참여 취소 ❌' : '나도 가능해요 ✅';
-  btn.style.background = isMine ? 'var(--surface2)' : 'var(--accent)';
-  btn.style.color = isMine ? 'var(--text)' : '#000';
-  if(isMine) btn.style.border = '1px solid var(--border)';
-}
+window.closeTooltip = function() {
+  const t = document.getElementById('tooltip');
+  t.classList.remove('visible');
+  t.style.display = 'none';
+};
 
-window.handleToggle = async () => {
-  const cur = !!roomData.members[myName]?.dates?.[activeDate];
-  await update(ref(db, `rooms/${roomId}/members/${myName}/dates`), { [activeDate]: !cur });
+window.tooltipToggle = async function() {
+  const members = roomData.members || {};
+  const myDates = (members[myName]?.dates) || {};
+  const current = !!myDates[tooltipDateStr];
+  await update(ref(db, `rooms/${roomId}/members/${myName}/dates`), { [tooltipDateStr]: !current });
+  // 로컬 즉시 반영
+  if (!roomData.members[myName].dates) roomData.members[myName].dates = {};
+  roomData.members[myName].dates[tooltipDateStr] = !current;
+  // 툴팁 내용 갱신
+  const dayEl = [...document.querySelectorAll('.day')].find(el => el._dateStr === tooltipDateStr);
+  closeTooltip();
+  renderCalendar();
 };
 
 function renderMembers() {
-  document.getElementById('members-list').innerHTML = Object.entries(roomData.members || {}).map(([n,m]) => 
-    `<div class="member-chip ${n===myName?'member-me':''}"><div class="member-dot" style="background:${m.color}"></div>${n}</div>`).join('');
+  const list = document.getElementById('members-list');
+  list.innerHTML = '';
+  Object.entries(roomData.members || {}).forEach(([name, m]) => {
+    const chip = document.createElement('div');
+    chip.className = 'member-chip' + (name === myName ? ' member-me' : '');
+    chip.innerHTML = `<div class="member-dot" style="background:${m.color}"></div><span>${name}${name === myName ? ' (나)' : ''}</span>`;
+    list.appendChild(chip);
+  });
 }
 
 function renderBest() {
-  const counts = {};
-  Object.values(roomData.members || {}).forEach(m => Object.keys(m.dates || {}).forEach(d => { if(m.dates[d]) counts[d] = (counts[d]||0)+1; }));
-  const sorted = Object.entries(counts).filter(([,c])=>c>0).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  document.getElementById('best-list').innerHTML = sorted.length
-    ? sorted.map(([d,c]) => `<div class="best-item"><span>${d}</span><span class="best-count">${c}명 가능</span></div>`).join('')
-    : '<div style="color:var(--muted); text-align:center;">날짜를 선택해 보세요!</div>';
+  const members = roomData.members || {};
+  const countMap = {}, whoMap = {};
+  Object.entries(members).forEach(([name, m]) => {
+    Object.keys(m.dates || {}).forEach(dk => {
+      if (m.dates[dk]) {
+        countMap[dk] = (countMap[dk] || 0) + 1;
+        if (!whoMap[dk]) whoMap[dk] = [];
+        whoMap[dk].push(name);
+      }
+    });
+  });
+  const sorted = Object.entries(countMap).filter(([,c]) => c > 0)
+    .sort((a,b) => b[1]-a[1] || a[0].localeCompare(b[0])).slice(0,5);
+  const list = document.getElementById('best-list');
+  list.innerHTML = '';
+  if (sorted.length === 0) {
+    list.innerHTML = '<p style="color:var(--muted);font-size:.85rem">아직 아무도 날짜를 선택하지 않았어요</p>';
+    return;
+  }
+  sorted.forEach(([date, count]) => {
+    const [,m,d] = date.split('-');
+    const dow = ['일','월','화','수','목','금','토'][new Date(date).getDay()];
+    const item = document.createElement('div');
+    item.className = 'best-item';
+    item.innerHTML = `
+      <div class="best-item-left">
+        <span>${+m}월 ${+d}일 (${dow})</span>
+        <span class="best-item-names">👤 ${(whoMap[date]||[]).join(', ')}</span>
+      </div>
+      <span class="best-count">${count}명 가능</span>`;
+    list.appendChild(item);
+  });
 }
 
-window.changeMonth = (n) => { viewMonth += n; if(viewMonth>11){viewMonth=0;viewYear++;} else if(viewMonth<0){viewMonth=11;viewYear--;} closePopup(); render(); };
-const closePopup = () => { document.getElementById('tooltip').style.display='none'; activeDate=''; };
-document.addEventListener('click', (e) => { if(!e.target.closest('#tooltip') && !e.target.closest('.day')) closePopup(); });
-
-// 초기 링크 자동 인식
-window.onload = () => {
-  const r = new URLSearchParams(location.search).get('r');
-  if(r) { roomId = r; document.getElementById('room-input').style.display = 'none'; }
+window.copyLink = function() {
+  navigator.clipboard.writeText(document.getElementById('share-url').textContent)
+    .then(() => status('링크 복사 완료! 친구에게 보내세요 🎉'));
 };
+
+window.addEventListener('load', () => {
+  const urlRoom = new URLSearchParams(location.search).get('r');
+  if (urlRoom) {
+    document.querySelector('[placeholder="방 이름 (새로 만들 때)"]').style.display = 'none';
+    document.querySelector('button[onclick="createRoom()"]').style.display = 'none';
+    status('링크로 접속했어요! 이름을 입력하고 "기존 방 참여"를 누르세요.');
+  }
+});
 </script>
 </body>
 </html>
