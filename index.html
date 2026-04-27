@@ -512,7 +512,10 @@ window.modalToggle = async function() {
   const myDates = (members[myName]?.dates) || {};
   const current = !!myDates[modalDateStr];
   await update(ref(db, `rooms/${roomId}/members/${myName}/dates`), { [modalDateStr]: !current });
-  closeModalDirect();
+  // 로컬 roomData 즉시 반영 후 모달 내용 갱신
+  if (!roomData.members[myName].dates) roomData.members[myName].dates = {};
+  roomData.members[myName].dates[modalDateStr] = !current;
+  openModal(modalDateStr);
 };
 
 window.closeModalOutside = function(e) {
