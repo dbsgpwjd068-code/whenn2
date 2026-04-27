@@ -190,27 +190,29 @@
 .modal-overlay {
   display: none;
   position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.75);
-  z-index: 100;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,.8);
+  z-index: 9999;
 }
-.modal-overlay.open { display: flex; }
+.modal-overlay.open { display: block; }
 .modal {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 24px;
   padding: 24px 20px 20px;
-  width: 100%;
+  width: calc(100% - 48px);
   max-width: 320px;
-  max-height: 80vh;
+  max-height: 70vh;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  box-shadow: 0 24px 60px rgba(0,0,0,.6);
+  box-shadow: 0 24px 60px rgba(0,0,0,.8);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10000;
 }
 .modal-date {
   font-family: 'Black Han Sans', sans-serif;
