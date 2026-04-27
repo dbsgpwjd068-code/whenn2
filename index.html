@@ -1,3 +1,4 @@
+HTML
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -13,7 +14,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--bg); color: var(--text); font-family: 'Gowun Dodum', sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
 
-    /* ── 원본 헤더 디자인 유지 ── */
+    /* ── 원본 헤더 디자인 ── */
     header { width: 100%; padding: 40px 20px 28px; text-align: center; border-bottom: 1px solid var(--border); position: relative; overflow: hidden; }
     header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 120% at 50% -20%, rgba(200,240,96,.12) 0%, transparent 70%); pointer-events: none; }
     header h1 { font-family: 'Black Han Sans', sans-serif; font-size: clamp(2rem, 6vw, 3.2rem); color: var(--accent); position: relative; }
@@ -21,23 +22,26 @@
 
     main { width: 100%; max-width: 860px; padding: 28px 20px 60px; display: flex; flex-direction: column; gap: 24px; }
     .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
-    .card-title { font-family: 'Black Han Sans', sans-serif; color: var(--accent); margin-bottom: 16px; }
+    .card-title { font-family: 'Black Han Sans', sans-serif; font-size: 1.05rem; color: var(--accent); margin-bottom: 16px; }
 
     .setup-row { display: flex; gap: 10px; flex-wrap: wrap; }
-    .setup-row input { flex: 1; min-width: 160px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 11px 16px; color: var(--text); outline: none; }
+    .setup-row input { flex: 1; min-width: 160px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 11px 16px; color: var(--text); outline: none; transition: 0.2s; }
+    .setup-row input:focus { border-color: var(--accent); }
     
     button { background: var(--accent); color: #0d0d0f; border: none; border-radius: 10px; padding: 11px 22px; font-family: 'Black Han Sans', sans-serif; cursor: pointer; transition: 0.15s; }
     button.secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    button:active { transform: scale(0.97); }
 
     .share-banner { display: none; align-items: center; gap: 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; }
     .share-banner.visible { display: flex; }
     .share-url { flex: 1; font-size: .82rem; color: var(--accent2); word-break: break-all; }
 
     .cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .cal-month { font-family: 'Black Han Sans', sans-serif; font-size: 1.15rem; }
     .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
     .cal-dow { text-align: center; font-size: .72rem; color: var(--muted); padding: 4px 0 8px; }
     
-    .day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 10px; border: 1.5px solid transparent; cursor: pointer; font-size: .85rem; transition: 0.15s; gap: 2px; }
+    .day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 10px; border: 1.5px solid transparent; cursor: pointer; font-size: .85rem; transition: 0.15s; position: relative; }
     .day.past { opacity: .3; cursor: not-allowed; }
     .day.today .day-num { color: var(--accent); font-weight: bold; }
     .day.mine { border-color: var(--accent) !important; }
@@ -46,32 +50,33 @@
     .day.heat-3 { background: rgba(200,240,96,.40); }
     .day.heat-4 { background: rgba(200,240,96,.60); }
     .day.heat-5 { background: rgba(200,240,96,.80); border-color: var(--accent); }
-    .day-dots { display: flex; gap: 2px; flex-wrap: wrap; justify-content: center; max-width: 36px; }
+    
+    .day-dots { display: flex; gap: 2px; flex-wrap: wrap; justify-content: center; margin-top: 2px; min-height: 5px; }
     .dot { width: 5px; height: 5px; border-radius: 50%; }
 
-    /* ── 팝업형 툴팁 (최상위 고정) ── */
+    /* ── 팝업 툴팁 (공중에 떠있는 레이어) ── */
     #tooltip {
       display: none; position: fixed; z-index: 9999;
-      background: #1e1e26; border: 1px solid var(--border); border-radius: 12px;
-      padding: 12px; width: 170px; box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-      flex-direction: column; gap: 8px; pointer-events: auto;
+      background: #1e1e26; border: 1px solid var(--border); border-radius: 14px;
+      padding: 14px; width: 180px; box-shadow: 0 12px 40px rgba(0,0,0,0.7);
+      flex-direction: column; gap: 10px; pointer-events: auto;
     }
     #tooltip::after { content: ""; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid #1e1e26; }
-    .tooltip-date { font-family: 'Black Han Sans', sans-serif; font-size: 0.9rem; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 6px; }
-    .tooltip-list { max-height: 80px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
-    .tooltip-user { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; }
-    .tooltip-dot { width: 7px; height: 7px; border-radius: 50%; }
-    .tooltip-btn { width: 100%; padding: 8px; font-size: 0.75rem; border-radius: 8px; margin-top: 4px; }
+    .tt-date { font-family: 'Black Han Sans', sans-serif; font-size: 0.95rem; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    .tt-list { max-height: 100px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+    .tt-user { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; }
+    .tt-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .tt-btn { width: 100%; padding: 10px; font-size: 0.8rem; border-radius: 8px; margin-top: 4px; }
 
     .members-list { display: flex; flex-wrap: wrap; gap: 8px; }
-    .member-chip { display: flex; align-items: center; gap: 6px; background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; font-size: .85rem; }
-    .member-dot { width: 9px; height: 9px; border-radius: 50%; }
+    .member-chip { display: flex; align-items: center; gap: 6px; background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: .85rem; }
+    .member-dot { width: 10px; height: 10px; border-radius: 50%; }
     .member-me { border-color: var(--accent); color: var(--accent); }
     
-    .best-list { display: flex; flex-direction: column; gap: 8px; }
-    .best-item { display: flex; align-items: center; justify-content: space-between; background: var(--surface2); border-radius: 10px; padding: 10px 16px; font-size: .9rem; }
-    .best-count { font-family: 'Black Han Sans', sans-serif; color: var(--accent); }
-    #status { text-align: center; font-size: .82rem; color: var(--muted); min-height: 20px; margin-bottom: 20px; }
+    .best-list { display: flex; flex-direction: column; gap: 10px; }
+    .best-item { display: flex; align-items: center; justify-content: space-between; background: var(--surface2); border-radius: 12px; padding: 12px 18px; font-size: .95rem; }
+    .best-count { font-family: 'Black Han Sans', sans-serif; color: var(--accent); font-size: 1.1rem; }
+    #status { text-align: center; font-size: .85rem; color: var(--muted); margin: 20px 0; }
   </style>
 </head>
 <body>
@@ -85,16 +90,17 @@
   <div class="card" id="setup-card">
     <div class="card-title">👤 이름 입력 & 방 만들기</div>
     <div class="setup-row">
-      <input id="name-input" type="text" placeholder="내 이름" maxlength="12"/>
+      <input id="name-input" type="text" placeholder="내 이름 (예: 김철수)" maxlength="12"/>
       <input id="room-input" type="text" placeholder="방 이름 (새로 만들 때)" maxlength="20"/>
       <button onclick="createRoom()">방 만들기</button>
-      <button class="secondary" onclick="joinRoom()">기존 방 참여</button>
+      <button class="secondary" onclick="joinRoom()">참여하기</button>
     </div>
   </div>
 
   <div class="share-banner" id="share-banner">
+    <span style="color:var(--muted); font-size: 0.8rem;">🔗 링크:</span>
     <span class="share-url" id="share-url"></span>
-    <button onclick="copyLink()">복사</button>
+    <button onclick="copyLink()" style="padding: 6px 12px; font-size: 0.8rem;">복사</button>
   </div>
 
   <div class="card" id="cal-card" style="display:none">
@@ -104,6 +110,7 @@
       <button class="secondary" onclick="changeMonth(1)">▶</button>
     </div>
     <div class="cal-grid" id="cal-grid"></div>
+    <p style="margin-top:15px; font-size:0.8rem; color:var(--muted); text-align:center;">날짜를 클릭해 누가 가능한지 확인하세요!</p>
   </div>
 
   <div class="card" id="members-card" style="display:none">
@@ -112,16 +119,16 @@
   </div>
 
   <div class="card" id="best-card" style="display:none">
-    <div class="card-title">🏆 모두가 가능한 날 TOP 5</div>
+    <div class="card-title">🏆 추천 날짜 TOP 5</div>
     <div class="best-list" id="best-list"></div>
   </div>
   <div id="status"></div>
 </main>
 
 <div id="tooltip">
-  <div class="tooltip-date" id="tooltip-date"></div>
-  <div class="tooltip-list" id="tooltip-list"></div>
-  <button id="tooltip-btn" class="tooltip-btn" onclick="toggleSelectedDate()"></button>
+  <div class="tt-date" id="tt-date"></div>
+  <div class="tt-list" id="tt-list"></div>
+  <button id="tt-btn" class="tt-btn" onclick="toggleDateAction()"></button>
 </div>
 
 <script type="module">
@@ -147,7 +154,7 @@ const COLORS = ['#c8f060','#60f0c8','#f0c860','#f060a8','#60a8f0','#a860f0','#f0
 window.createRoom = async function() {
   const name = document.getElementById('name-input').value.trim();
   const rname = document.getElementById('room-input').value.trim() || '우리의 약속';
-  if (!name) return alert('이름 필수!');
+  if (!name) return alert('이름을 입력하세요!');
   roomId = Math.random().toString(36).slice(2,8).toUpperCase();
   myName = name; myColor = COLORS[0];
   await set(ref(db, `roomNames/${rname.replace(/[.#$[\]]/g, '_')}`), roomId);
@@ -158,12 +165,12 @@ window.createRoom = async function() {
 window.joinRoom = async function() {
   const name = document.getElementById('name-input').value.trim();
   const urlRoom = new URLSearchParams(location.search).get('r');
-  if (!name) return alert('이름 입력!');
-  roomId = urlRoom || roomId; 
-  if(!roomId) return alert('방 이름을 입력하거나 링크로 오세요!');
+  if (!name) return alert('이름을 입력하세요!');
+  roomId = urlRoom || roomId;
+  if(!roomId) return alert('링크로 접속하거나 방 이름을 확인하세요!');
   myName = name;
   const snap = await get(ref(db, `rooms/${roomId}`));
-  if(!snap.exists()) return alert('방 없음');
+  if(!snap.exists()) return alert('방을 찾을 수 없습니다.');
   const members = snap.val().members || {};
   if(!members[name]) {
     myColor = COLORS[Object.keys(members).length % COLORS.length];
@@ -176,11 +183,11 @@ function initRoom() {
   const d = new Date(); viewYear = d.getFullYear(); viewMonth = d.getMonth();
   document.getElementById('setup-card').style.display = 'none';
   ['cal-card','members-card','best-card'].forEach(id => document.getElementById(id).style.display = 'block');
-  document.getElementById('share-url').textContent = location.origin + location.pathname + '?r=' + roomId;
+  document.getElementById('share-url').textContent = window.location.href.split('?')[0] + '?r=' + roomId;
   document.getElementById('share-banner').classList.add('visible');
-  history.replaceState({}, '', `?r=${roomId}`);
+  history.replaceState({}, '', '?r=' + roomId);
   onValue(ref(db, `rooms/${roomId}`), snap => {
-    if(snap.exists()) { roomData = snap.val(); renderCalendar(); renderMembers(); renderBest(); if(activeDate) updateTooltip(); }
+    if(snap.exists()) { roomData = snap.val(); renderCalendar(); renderMembers(); renderBest(); if(activeDate) updateTooltipUI(); }
   });
 }
 
@@ -190,45 +197,60 @@ function renderCalendar() {
   ['일','월','화','수','목','금','토'].forEach(d => {
     const el = document.createElement('div'); el.className = 'cal-dow'; el.textContent = d; grid.appendChild(el);
   });
-  const first = new Date(viewYear, viewMonth, 1).getDay();
-  const total = new Date(viewYear, viewMonth+1, 0).getDate();
-  for (let i = 0; i < first; i++) grid.appendChild(document.createElement('div')).className = 'day empty';
-  for (let d = 1; d <= total; d++) {
+  const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+  const lastDate = new Date(viewYear, viewMonth+1, 0).getDate();
+  
+  for (let i = 0; i < firstDay; i++) grid.appendChild(document.createElement('div')).className = 'day empty';
+  
+  for (let d = 1; d <= lastDate; d++) {
     const ds = `${viewYear}-${String(viewMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const who = Object.entries(roomData.members || {}).filter(([,m]) => m.dates?.[ds]).map(([n,m]) => m.color);
+    const members = roomData.members || {};
+    const who = Object.entries(members).filter(([,m]) => m.dates?.[ds]).map(([n,m]) => m.color);
+    
     const el = document.createElement('div');
-    el.className = `day ${ds<today()?'past':''} ${ds===today()?'today':''} ${roomData.members?.[myName]?.dates?.[ds]?'mine':''} ${who.length?`heat-${Math.min(5, who.length)}`:''}`;
+    el.className = `day ${ds < today() ? 'past' : ''} ${ds === today() ? 'today' : ''} ${members[myName]?.dates?.[ds] ? 'mine' : ''} ${who.length ? `heat-${Math.min(5, who.length)}` : ''}`;
     el.innerHTML = `<div class="day-num">${d}</div><div class="day-dots">${who.map(c=>`<div class="dot" style="background:${c}"></div>`).join('')}</div>`;
-    if(ds >= today()) el.onclick = (e) => { e.stopPropagation(); openTooltip(ds, el); };
+    
+    if(ds >= today()) {
+      el.onclick = (e) => { e.stopPropagation(); openTooltipPopup(ds, el); };
+    }
     grid.appendChild(el);
   }
 }
 
-function openTooltip(ds, el) {
+function openTooltipPopup(ds, el) {
   activeDate = ds;
   const tt = document.getElementById('tooltip');
   const rect = el.getBoundingClientRect();
+  
   tt.style.display = 'flex';
-  tt.style.top = `${rect.top + window.scrollY - tt.offsetHeight - 12}px`;
-  tt.style.left = `${rect.left + window.scrollX + rect.width/2 - tt.offsetWidth/2}px`;
-  updateTooltip();
+  // 팝업 위치: 클릭한 요소의 중앙 상단
+  const ttX = rect.left + window.scrollX + rect.width / 2 - tt.offsetWidth / 2;
+  const ttY = rect.top + window.scrollY - tt.offsetHeight - 15;
+  
+  tt.style.left = `${Math.max(10, Math.min(ttX, window.innerWidth - tt.offsetWidth - 10))}px`;
+  tt.style.top = `${ttY}px`;
+  updateTooltipUI();
 }
 
-function updateTooltip() {
+function updateTooltipUI() {
   const ds = activeDate;
-  document.getElementById('tooltip-date').textContent = ds;
+  if(!ds) return;
+  document.getElementById('tt-date').textContent = ds;
   const who = Object.entries(roomData.members || {}).filter(([,m]) => m.dates?.[ds]);
-  document.getElementById('tooltip-list').innerHTML = who.length 
-    ? who.map(([n,m]) => `<div class="tooltip-user"><div class="tooltip-dot" style="background:${m.color}"></div>${n}</div>`).join('')
-    : '<div style="font-size:0.7rem;color:#888">가능한 사람 없음</div>';
+  document.getElementById('tt-list').innerHTML = who.length 
+    ? who.map(([n,m]) => `<div class="tt-user"><div class="tt-dot" style="background:${m.color}"></div><span>${n}</span></div>`).join('')
+    : '<div style="font-size:0.75rem; color:var(--muted); text-align:center;">가능한 사람 없음</div>';
+    
   const isMine = !!roomData.members?.[myName]?.dates?.[ds];
-  const btn = document.getElementById('tooltip-btn');
-  btn.textContent = isMine ? '나도 안돼요 ❌' : '나도 가능해요 ✅';
+  const btn = document.getElementById('tt-btn');
+  btn.textContent = isMine ? '선택 취소하기 ❌' : '나도 가능해요! ✅';
   btn.style.background = isMine ? 'var(--surface2)' : 'var(--accent)';
   btn.style.color = isMine ? 'var(--text)' : '#000';
+  btn.style.border = isMine ? '1px solid var(--border)' : 'none';
 }
 
-window.toggleSelectedDate = async function() {
+window.toggleDateAction = async function() {
   const current = !!roomData.members[myName]?.dates?.[activeDate];
   await update(ref(db, `rooms/${roomId}/members/${myName}/dates`), { [activeDate]: !current });
 };
@@ -244,13 +266,13 @@ function renderBest() {
   const sorted = Object.entries(counts).filter(([,c])=>c>0).sort((a,b)=>b[1]-a[1]).slice(0,5);
   document.getElementById('best-list').innerHTML = sorted.length 
     ? sorted.map(([d,c]) => `<div class="best-item"><span>${d}</span><span class="best-count">${c}명 가능</span></div>`).join('')
-    : '<p style="color:var(--muted);font-size:.85rem">선택된 날짜 없음</p>';
+    : '<p style="color:var(--muted);font-size:.85rem;text-align:center;">아직 선택된 날짜가 없어요</p>';
 }
 
-window.changeMonth = (n) => { viewMonth += n; if(viewMonth>11){viewMonth=0;viewYear++;} else if(viewMonth<0){viewMonth=11;viewYear--;} closeTooltip(); renderCalendar(); };
-const closeTooltip = () => { document.getElementById('tooltip').style.display='none'; activeDate=''; };
-document.addEventListener('click', (e) => { if(!e.target.closest('#tooltip')) closeTooltip(); });
-window.copyLink = () => { navigator.clipboard.writeText(document.getElementById('share-url').textContent).then(()=>alert('복사완료!')); };
+window.changeMonth = (n) => { viewMonth += n; if(viewMonth>11){viewMonth=0;viewYear++;} else if(viewMonth<0){viewMonth=11;viewYear--;} hideTooltip(); renderCalendar(); };
+const hideTooltip = () => { document.getElementById('tooltip').style.display='none'; activeDate=''; };
+document.addEventListener('click', (e) => { if(!e.target.closest('#tooltip') && !e.target.closest('.day')) hideTooltip(); });
+window.copyLink = () => { navigator.clipboard.writeText(document.getElementById('share-url').textContent).then(()=>alert('링크가 복사되었습니다!')); };
 function today() { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 </script>
 </body>
